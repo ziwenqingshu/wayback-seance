@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wayback Séance · ofrendas for dead websites</title>
+<meta name="description" content="A local open-weight model speaks as the ghost of a dead website, and may only remember what the Internet Archive kept.">
+<meta property="og:title" content="Wayback Séance · 网页招魂">
+<meta property="og:description" content="Ghosts of dead websites, grounded in real Wayback Machine snapshots. Gemma 3 on a CPU, every sentence cited.">
+<meta property="og:image" content="https://raw.githubusercontent.com/ziwenqingshu/wayback-seance/main/docs/cover.png">
+<style>
+:root{--night:#120a18;--ink:#f6ead2;--bone:#efe3c8;--muted:#b9a98f;--marigold:#f4a42a;--cempa:#ff7a1a;--violet:#a98bd6;--card:#1c1224;--line:#3a2a44}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font:17px/1.65 "Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Noto Serif SC",serif;
+background:radial-gradient(1200px 600px at 50% -10%,#3a1d3f 0%,transparent 60%),radial-gradient(900px 500px at 50% 110%,#2b1206 0%,transparent 60%),var(--night);min-height:100vh}
+a{color:var(--marigold)}
+.picado{display:flex;height:56px;overflow:hidden}
+.picado span{flex:1;margin:0 3px;clip-path:polygon(0 0,100% 0,100% 78%,88% 100%,75% 78%,62% 100%,50% 78%,38% 100%,25% 78%,12% 100%,0 78%);opacity:.92;
+background-image:radial-gradient(circle at 50% 34%,var(--night) 6px,transparent 7px),radial-gradient(circle at 24% 52%,var(--night) 3px,transparent 4px),radial-gradient(circle at 76% 52%,var(--night) 3px,transparent 4px)}
+.picado span:nth-child(5n+1){background-color:#e0457b}.picado span:nth-child(5n+2){background-color:#f4a42a}.picado span:nth-child(5n+3){background-color:#3fb8af}
+.picado span:nth-child(5n+4){background-color:#8e5fd1}.picado span:nth-child(5n){background-color:#ff7a1a}
+main{max-width:900px;margin:0 auto;padding:30px 22px 80px}
+h1{font-size:clamp(40px,7vw,70px);line-height:1.05;margin:.3em 0 .1em;color:var(--bone);text-align:center;text-shadow:0 0 28px rgba(244,164,42,.35)}
+.zh{display:block;font-size:.5em;color:var(--marigold);letter-spacing:.3em;margin-top:.2em}
+.lede{max-width:680px;margin:18px auto 0;text-align:center;color:var(--muted);font-size:19px}
+.lede b{color:var(--bone);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:40px 0}
+.card{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;text-decoration:none;color:var(--ink);transition:transform .15s,border-color .15s}
+.card:hover{transform:translateY(-3px);border-color:var(--marigold)}
+.card .site{font-size:24px;color:var(--bone);font-weight:600}
+.card .years{color:var(--marigold);letter-spacing:.12em;font-size:15px}
+.card p{margin:8px 0 0;color:var(--muted);font-size:15px}
+.gif{display:block;width:100%;border-radius:12px;border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+h2{color:var(--bone);font-size:26px;margin:48px 0 8px}
+h2:before{content:"✿ ";color:var(--marigold)}
+code{background:#24182d;border-radius:6px;padding:2px 6px;font-size:15px}
+pre{background:#1a1121;border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-size:14px;line-height:1.5}
+footer{margin-top:60px;color:var(--muted);font-size:14px;border-top:1px solid var(--line);padding-top:18px}
+</style>
+</head>
+<body>
+<div class="picado" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+<main>
+<h1>Wayback Séance<span class="zh">网 页 招 魂</span></h1>
+<p class="lede">A small open-weight model, running on a plain CPU, speaks as the ghost of a dead website.
+<b>It may only remember what the Internet Archive kept:</b> every sentence cites a real snapshot, and every
+sentence that doesn't match its snapshot is struck through by the medium.</p>
+
+<div class="grid">
+  <a class="card" href="geocities.html"><div class="site">geocities.com</div><div class="years">1996 – 2007</div><p>Free home pages, neighborhoods, and the long Yahoo! years.</p></a>
+  <a class="card" href="del.html"><div class="site">del.icio.us</div><div class="years">2003 – 2025</div><p>Social bookmarking, many owners, and a strange afterlife.</p></a>
+  <a class="card" href="vine.html"><div class="site">vine.co</div><div class="years">2012 – 2019</div><p>Six-second loops, then an archive of itself.</p></a>
+  <a class="card" href="geocities.zh.html"><div class="site">geocities.com</div><div class="years">中文 · 1996 – 2007</div><p>同一个幽灵，用中文讲述，引用英文原文。</p></a>
+</div>
+
+<img class="gif" src="demo.gif" alt="A terminal séance: snapshots of geocities.com are summoned, then the ghost speaks sentence by sentence; unverified sentences are struck through.">
+
+<h2>Summon one yourself</h2>
+<pre><code>pip install git+https://github.com/ziwenqingshu/wayback-seance
+llama-server -hf unsloth/gemma-3-4b-it-GGUF:Q4_0 --port 8080 -c 4096
+seance geocities.com            # or --lang zh</code></pre>
+<p>No API keys, no cloud. Code, tests and how the grounding check works:
+<a href="https://github.com/ziwenqingshu/wayback-seance">github.com/ziwenqingshu/wayback-seance</a>.</p>
+
+<footer>Snapshots courtesy of the Internet Archive's Wayback Machine. It is how the web remembers;
+<a href="https://archive.org/donate">please support it</a>. Ghost voiced by Gemma 3 4B (open weights) through llama.cpp. MIT licensed.</footer>
+</main>
+</body>
+</html>
