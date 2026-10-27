@@ -73,5 +73,6 @@ def test_moved_since_and_facts_lines():
     assert _moved_since({2000: alive, 2001: dead, 2002: dead}) == 2001
     assert _moved_since({2000: dead, 2001: dead}) is None
     assert _moved_since({2000: alive}) is None
+    assert _moved_since({2000: alive, 2001: alive, 2002: dead}) is None
     f = Facts("ex.com", "2000-01-01", "2000-01-01", None, 1, {}, None)
     assert len(f.lines()) == 2 and f.years == {2000}

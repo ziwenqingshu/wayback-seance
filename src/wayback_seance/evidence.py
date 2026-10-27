@@ -102,7 +102,7 @@ class Evidence:
 def _moved_since(activity: dict[int, dict[str, int]]) -> int | None:
     """First year after which redirects/errors outnumber live pages every year."""
     years = sorted(activity)
-    for i, year in enumerate(years):
+    for i, year in enumerate(years[:-1]):  # one bad year at the very end is not yet an afterlife
         tail = years[i:]
         if all(activity[y]["moved"] + activity[y]["gone"] > activity[y]["alive"] for y in tail):
             return year if i > 0 else None
