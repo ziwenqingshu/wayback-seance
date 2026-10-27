@@ -1,0 +1,59 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "wayback-seance"
+version = "0.1.0"
+description = "Summon the ghost of a dead website: a local open-weight model tells its life story, citing only real Wayback Machine snapshots."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+authors = [{ name = "Zhixin Qin" }]
+keywords = ["wayback-machine", "internet-archive", "llm", "gemma", "llama.cpp", "halloween", "dia-de-los-muertos", "grounding"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "License :: OSI Approved :: MIT License",
+  "Environment :: Console",
+  "Topic :: Internet :: WWW/HTTP",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = []
+
+[project.optional-dependencies]
+llama-cpp = ["llama-cpp-python>=0.3"]
+
+[project.scripts]
+seance = "wayback_seance.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/ziwenqingshu/wayback-seance"
+Demo = "https://ziwenqingshu.github.io/wayback-seance/"
+
+[dependency-groups]
+dev = ["pytest>=8", "pytest-cov>=5", "ruff>=0.6"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/wayback_seance"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["RUF001", "RUF002", "RUF003", "E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.coverage.run]
+source = ["wayback_seance"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
