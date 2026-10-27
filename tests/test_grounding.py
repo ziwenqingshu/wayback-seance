@@ -177,3 +177,9 @@ def test_numbers_match_as_numbers(evidence):
 def test_quoted_english_question_then_space_then_chinese_does_not_split():
     out = feed_all("我只记得“Don't mind ads on your site?”\n的承诺。[S4]")
     assert len(out) == 1
+
+
+def test_capitalised_my_counts_as_first_person():
+    from wayback_seance.grounding import _unwrap
+
+    assert _unwrap("“My pages were free.”") == "My pages were free."

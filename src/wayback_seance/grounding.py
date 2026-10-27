@@ -475,7 +475,7 @@ def _unwrap(text: str) -> str:
         if right not in inner:
             speech = inner  # opened and never closed
         # only the ghost's own first-person voice gets unwrapped; a bare page quote stays a quote
-        if speech is not None and re.search(r"\b(I|my|me|mine)\b|我", speech):
+        if speech is not None and re.search(r"(?i)\b(i|my|me|mine)\b|我", speech):
             return speech
     return t
 
