@@ -22,7 +22,7 @@ jobs:
           python-version: "3.12"
       - name: Lint
         run: uv run --group dev ruff check . && uv run --group dev ruff format --check .
-      - name: Test (offline: recorded archive fixtures + a fake model)
+      - name: "Test (offline: recorded archive fixtures + a fake model)"
         run: uv run --group dev pytest --cov --cov-report=term-missing --cov-fail-under=90
       - name: Offline séance smoke test
         run: uv run seance geocities.com --fixtures tests/fixtures/geocities --backend fake --no-color -o smoke.html
