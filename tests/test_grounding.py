@@ -140,3 +140,40 @@ def test_translated_quote_is_not_held_to_verbatim(evidence):
     assert s.verdict != UNVERIFIED, s.reasons
     s = check("我记得“欢迎来到Tripod主页”。[S1]", evidence, chinese=True)
     assert s.verdict == UNVERIFIED
+
+
+def test_whole_sentence_in_quotes_is_voice_not_a_quote(evidence):
+    from wayback_seance.grounding import _unwrap
+
+    assert _unwrap("“I offered Free Home Pages to everyone.”") == "I offered Free Home Pages to everyone."
+    assert _unwrap('"I never closed') == "I never closed"
+    assert _unwrap('"Never closed') == '"Never closed'
+    assert _unwrap("“Free” and “Home”") == "“Free” and “Home”"
+    assert _unwrap("plain") == "plain"
+    s = check("“I offered Free Home Pages and Free Member Email to everyone.” [S1]", evidence)
+    assert s.verdict == GROUNDED, s.reasons
+
+
+def test_mixed_chinese_gloss_with_one_name_is_only_faint(evidence):
+    s = check("我最初叫做“欢迎来到GeoCities主页”，提供“免费的主页”。[S1]", evidence, chinese=True)
+    assert s.verdict == FAINT
+
+
+def test_quoted_english_question_inside_chinese_does_not_split():
+    out = feed_all("我只记得“Don't mind ads on your site?”的承诺。[S4]")
+    assert out == ["我只记得“Don't mind ads on your site?”的承诺。[S4]"]
+
+
+def test_a_bare_page_quote_is_still_checked(evidence):
+    s = check("“No ads plus more storage for just $4.95/mo.” [S1]", evidence)
+    assert s.verdict == UNVERIFIED
+
+
+def test_numbers_match_as_numbers(evidence):
+    s = check("GeoPlus let you use up to 1MB for your site. [S1]", evidence)  # the page says 10MB
+    assert s.verdict == UNVERIFIED
+
+
+def test_quoted_english_question_then_space_then_chinese_does_not_split():
+    out = feed_all("我只记得“Don't mind ads on your site?”\n的承诺。[S4]")
+    assert len(out) == 1

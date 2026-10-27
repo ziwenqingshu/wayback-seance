@@ -31,7 +31,9 @@ _CLOSERS = "\"'”’」』)）*"
 _QUOTE = re.compile(r"\"([^\"]{2,200})\"|“([^”]{2,200})”|「([^」]{2,200})」|『([^』]{2,200})』")
 _WORD = re.compile(r"[A-Za-z0-9][A-Za-z0-9'’&+.-]*[A-Za-z0-9+]|[A-Za-z0-9]")
 _YEAR = re.compile(r"(?<!\d)(19[89]\d|20[0-3]\d)(?!\d)")
-_NUMBER = re.compile(r"(?<![\w.])\d[\d,.]*\d(?:\s?(?:mb|gb|kb|k|m|%))?|(?<![\w.])\d{2,}", re.I)
+_NUMBER = re.compile(
+    r"(?<![\w.])\d[\d,.]*\d(?:\s?(?:mb|gb|kb|k|m|%))?|(?<![\w.])\d+\s?(?:mb|gb|kb|%)|(?<![\w.])\d{2,}", re.I
+)
 _CJK = re.compile(r"[\u3400-\u9fff]")
 
 STOPWORDS = set(
@@ -409,7 +411,10 @@ def _cut(text: str, *, final: bool) -> tuple[list[str], str]:
         if not absorbed and (_open_quote(text[start:j]) or (after[:1].islower() and ch not in _CJK_TERMINATORS)):
             i = j  # still inside a quotation, or the sentence carries on in lower case
             continue
-        if ch in _CJK_TERMINATORS or nxt.isspace() or _CJK.match(nxt):
+        if not absorbed and ch not in _CJK_TERMINATORS and _CJK.match(after[:1] or " "):
+            i = j  # an English "?" or "!" quoted inside a Chinese sentence
+            continue
+        if ch in _CJK_TERMINATORS or nxt.isspace():
             piece = text[start:j].strip()
             if piece:
                 out.append(piece)
@@ -451,6 +456,28 @@ def _open_quote(piece: str) -> bool:
     if piece.count("“") > piece.count("”") or piece.count("「") > piece.count("」"):
         return True
     return piece.count('"') % 2 == 1
+
+
+def _num_key(num: str) -> str:
+    """'1,300' and '1300' are the same number; '4.95' is not '495'."""
+    return re.sub(r"[^\d.]", "", num).strip(".")
+
+
+def _unwrap(text: str) -> str:
+    """The ghost sometimes wraps its whole speech in quotation marks; that is voice, not a citation."""
+    t = text.strip()
+    for left, right in (("“", "”"), ('"', '"'), ("「", "」")):
+        if not t.startswith(left):
+            continue
+        inner = t[len(left) :]
+        body = inner.rstrip(".。!?！？ ")
+        speech = body[:-1] if body.endswith(right) and body.index(right) == len(body) - 1 else None
+        if right not in inner:
+            speech = inner  # opened and never closed
+        # only the ghost's own first-person voice gets unwrapped; a bare page quote stays a quote
+        if speech is not None and re.search(r"\b(I|my|me|mine)\b|我", speech):
+            return speech
+    return t
 
 
 def _loose_quote(q_stems: list[str], corpus: str, corpus_stems: set[str]) -> bool:
@@ -533,17 +560,15 @@ def check(raw: str, evidence: Evidence, *, allowed: Iterable[str] | None = None,
     corpus_lower = corpus.lower()
 
     hard_fail = False
-    quotes = [next(g for g in m.groups() if g) for m in _QUOTE.finditer(text)]
+    quotes = [next(g for g in m.groups() if g) for m in _QUOTE.finditer(_unwrap(text))]
     good_quotes = 0
     for q in quotes:
         qn = _norm(q)
         q_stems = [_stem(w) for w in _WORD.findall(q)]
-        if not qn:
-            continue
+        if not qn or _CJK.search(q):
+            continue  # a translated gloss is not a verbatim quote; its Latin names are checked below
         if f" {qn} " in corpus_norm or _loose_quote(q_stems, corpus, corpus_stems):
             good_quotes += 1
-        elif _CJK.search(q):
-            continue  # a translated gloss, not a verbatim quote; its Latin names are still checked below
         else:
             hard_fail = True
             sent.reasons.append(f'quote "{q}" is not in {"/".join(cites)}')
@@ -555,9 +580,9 @@ def check(raw: str, evidence: Evidence, *, allowed: Iterable[str] | None = None,
             sent.reasons.append(f"the year {y} does not appear in {'/'.join(cites)}")
 
     text_wo_years = _YEAR.sub(" ", text)
+    corpus_numbers = {_num_key(n) for n in _NUMBER.findall(corpus)}
     for num in _NUMBER.findall(text_wo_years):
-        digits = re.sub(r"[^\d]", "", num)
-        if digits and digits not in re.sub(r"[^\d]", "", corpus) and num.lower().strip() not in corpus_lower:
+        if _num_key(num) not in corpus_numbers and num.lower().strip() not in corpus_lower:
             hard_fail = True
             sent.reasons.append(f"the number {num.strip()} does not appear in {'/'.join(cites)}")
 
